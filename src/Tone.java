@@ -1,13 +1,19 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-public class Tone {
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
+public class Tone {
+	
+	private static final List<Songs> songs = getSongs();
     // Mary had a little lamb
     private static final List<BellNote> song = new ArrayList<BellNote>() {{
             add(new BellNote(Note.A5, NoteLength.QUARTER));
@@ -69,6 +75,62 @@ public class Tone {
             line.drain();
         }
     }
+    
+    private void getSongs () {
+    	
+    	File dir = new File("songs");
+    	
+    	List<Song> songs = new ArrayList<Song>();
+    	
+    	if (dir.isDirectory()) {
+    		File[] files = dir.listFiles();
+	        for(File file : files){
+	        	if(file.isFile()) {
+	        		songs.add(new Song(getSong(file.getPath())));
+	        	}
+	        }
+    	}
+    }
+    
+    private List<BellNote> getSong(String path) {
+    	File song = new File(path);
+    	Scanner scanny;
+    	Note note;
+    	NoteLength length;
+    	try {
+    		scanny = new Scanner(song);
+    		note = toNote(scanny.next());
+    		
+    	} catch {}
+    	
+    }
+    
+    private Note toNote(String str) {
+    	switch (str) {
+        	case "REST":
+        		return Note.REST;
+        	case "A4":
+        		return Note.A4;
+        	case "A4S":
+        		return Note.A4S;
+        	case "REST":
+        		return Note.REST;
+        		
+        A4,
+        A4S,
+        B4,
+        C4,
+        C4S,
+        D4,
+        D4S,
+        E4,
+        F4,
+        F4S,
+        G4,
+        G4S,
+        A5;
+    	}
+    }
 
     private void playNote(SourceDataLine line, BellNote bn) {
         final int ms = Math.min(bn.length.timeMs(), Note.MEASURE_LENGTH_SEC * 1000);
@@ -86,6 +148,14 @@ class BellNote {
         this.note = note;
         this.length = length;
     }
+}
+
+class Song {
+	final List<BellNote> song;
+	
+	Song(List<BellNote> song) {
+		this.song = song;
+	}
 }
 
 enum NoteLength {
