@@ -8,54 +8,32 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public class Tone {
 	
-	private static final List<Songs> songs = getSongs();
-    // Mary had a little lamb
-    private static final List<BellNote> song = new ArrayList<BellNote>() {{
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-            add(new BellNote(Note.G4, NoteLength.QUARTER));
-            add(new BellNote(Note.F4, NoteLength.QUARTER));
-            add(new BellNote(Note.G4, NoteLength.QUARTER));
-
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-            add(new BellNote(Note.A5, NoteLength.HALF));
-
-            add(new BellNote(Note.G4, NoteLength.QUARTER));
-            add(new BellNote(Note.G4, NoteLength.QUARTER));
-            add(new BellNote(Note.G4, NoteLength.HALF));
-
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-            add(new BellNote(Note.A5, NoteLength.HALF));
-
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-            add(new BellNote(Note.G4, NoteLength.QUARTER));
-            add(new BellNote(Note.F4, NoteLength.QUARTER));
-            add(new BellNote(Note.G4, NoteLength.QUARTER));
-
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-
-            add(new BellNote(Note.G4, NoteLength.QUARTER));
-            add(new BellNote(Note.G4, NoteLength.QUARTER));
-            add(new BellNote(Note.A5, NoteLength.QUARTER));
-            add(new BellNote(Note.G4, NoteLength.QUARTER));
-
-            add(new BellNote(Note.F4, NoteLength.WHOLE));
-        }};
-
     public static void main(String[] args) throws Exception {
-        final AudioFormat af =
-            new AudioFormat(Note.SAMPLE_RATE, 8, 1, true, false);
-        Tone t = new Tone(af);
-        t.playSong(song);
+    	
+    	final AudioFormat af = new AudioFormat(Note.SAMPLE_RATE, 8, 1, true, false);
+    	Tone t = new Tone(af);
+    	
+    	final List<Song> songs = t.getSongs();
+    	System.out.println("Track List:");
+    	for (int i = 0; i < songs.size(); i++) {
+    		System.out.println("   "+ (i+1) + ") " + songs.get(i).title);
+    	}
+    	System.out.println("From the list above, input the track number of the song you want the choir to sing.");
+    	
+    	Scanner s = new Scanner(System.in);
+    	
+    	while(!s.hasNext("[1-" + songs.size() +"]")) {
+    		System.out.println("Invaild Track! Please input a number between 1 and " + songs.size());
+    		s.next();
+    	}
+    	
+    	int trackNum = s.nextInt() - 1;
+    	Song song = songs.get(trackNum);
+        
+        t.playSong(songs.get(trackNum).getBellNotes());
     }
 
     private final AudioFormat af;
@@ -76,7 +54,7 @@ public class Tone {
         }
     }
     
-    private void getSongs () {
+    private  List<Song> getSongs() {
     	
     	File dir = new File("songs");
     	
@@ -86,52 +64,36 @@ public class Tone {
     		File[] files = dir.listFiles();
 	        for(File file : files){
 	        	if(file.isFile()) {
-	        		songs.add(new Song(getSong(file.getPath())));
+	        		final String path = file.getPath();
+	        		final String title = path.substring(path.indexOf("\\")+1);
+	        		List<BellNote> song;
+					song = getSong(path);
+					songs.add(new Song(song, title));
 	        	}
 	        }
     	}
+    	return songs;
     }
     
     private List<BellNote> getSong(String path) {
-    	File song = new File(path);
+    	List<BellNote> song = new ArrayList<BellNote>();
+    	File file = new File(path);
     	Scanner scanny;
     	Note note;
     	NoteLength length;
     	try {
-    		scanny = new Scanner(song);
-    		note = toNote(scanny.next());
-    		
-    	} catch {}
-    	
+		    scanny = new Scanner(file);
+		    while(scanny.hasNextLine()) {
+		        note = Note.valueOf(scanny.next());
+		        length = NoteLength.getNoteLength(scanny.nextInt());
+		        song.add(new BellNote(note,length));
+		        scanny.nextLine();
+		    }
+    	} catch (Exception ignore) {}
+    	return song;
     }
     
-    private Note toNote(String str) {
-    	switch (str) {
-        	case "REST":
-        		return Note.REST;
-        	case "A4":
-        		return Note.A4;
-        	case "A4S":
-        		return Note.A4S;
-        	case "REST":
-        		return Note.REST;
-        		
-        A4,
-        A4S,
-        B4,
-        C4,
-        C4S,
-        D4,
-        D4S,
-        E4,
-        F4,
-        F4S,
-        G4,
-        G4S,
-        A5;
-    	}
-    }
-
+   
     private void playNote(SourceDataLine line, BellNote bn) {
         final int ms = Math.min(bn.length.timeMs(), Note.MEASURE_LENGTH_SEC * 1000);
         final int length = Note.SAMPLE_RATE * ms / 1000;
@@ -148,13 +110,33 @@ class BellNote {
         this.note = note;
         this.length = length;
     }
+    
+    @Override
+    public String toString() {
+    	return note.toString() + " " + length.toString();
+    }
 }
 
 class Song {
 	final List<BellNote> song;
+	final String title;
 	
-	Song(List<BellNote> song) {
+	Song(List<BellNote> song, String title) {
 		this.song = song;
+		this.title = title;
+	}
+	
+	public List<BellNote> getBellNotes() {
+		return song;
+	}
+	
+	@Override
+	public String toString() {
+		String str = "";
+		for(BellNote n : song) {
+			str += n.toString() + "\n";
+		}
+		return str;
 	}
 }
 
@@ -172,6 +154,21 @@ enum NoteLength {
 
     public int timeMs() {
         return timeMs;
+    }
+    
+    public static NoteLength getNoteLength(int n) {
+    	switch (n) {
+    	case 1:
+    		return NoteLength.WHOLE;
+    	case 2:
+    		return NoteLength.HALF;
+    	case 4:
+    		return NoteLength.QUARTER;
+    	case 8:
+    		return NoteLength.EIGTH;
+    	default:
+    		throw new RuntimeException("Invalid value for NoteLength " + n);
+    	}
     }
 }
 
