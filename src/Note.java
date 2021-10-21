@@ -1,5 +1,5 @@
 
-enum Note {
+public enum Note {
     // REST Must be the first 'Note'
     REST,
     A4,

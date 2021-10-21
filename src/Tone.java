@@ -23,17 +23,21 @@ public class Tone {
     	}
     	System.out.println("From the list above, input the track number of the song you want the choir to sing.");
     	
-    	Scanner s = new Scanner(System.in);
-    	
-    	while(!s.hasNext("[1-" + songs.size() +"]")) {
-    		System.out.println("Invaild Track! Please input a number between 1 and " + songs.size());
-    		s.next();
-    	}
-    	
-    	int trackNum = s.nextInt() - 1;
-    	Song song = songs.get(trackNum);
+    	try (Scanner s = new Scanner(System.in)) {
+			while(!s.hasNext("[1-" + songs.size() +"]")) {
+				System.out.println("Invaild Track! Please input a number between 1 and " + songs.size());
+				s.next();
+			}
+			
+			int trackNum = s.nextInt() - 1;
+			Song song = songs.get(trackNum);
+			
+			Conductor c = new Conductor(song, af);
+			
+			c.playSong();
+		}
         
-        t.playSong(songs.get(trackNum).getBellNotes());
+        
     }
 
     private final AudioFormat af;
@@ -42,17 +46,6 @@ public class Tone {
         this.af = af;
     }
 
-    void playSong(List<BellNote> song) throws LineUnavailableException {
-        try (final SourceDataLine line = AudioSystem.getSourceDataLine(af)) {
-            line.open();
-            line.start();
-
-            for (BellNote bn: song) {
-                playNote(line, bn);
-            }
-            line.drain();
-        }
-    }
     
     private  List<Song> getSongs() {
     	
@@ -91,14 +84,6 @@ public class Tone {
 		    }
     	} catch (Exception ignore) {}
     	return song;
-    }
-    
-   
-    private void playNote(SourceDataLine line, BellNote bn) {
-        final int ms = Math.min(bn.length.timeMs(), Note.MEASURE_LENGTH_SEC * 1000);
-        final int length = Note.SAMPLE_RATE * ms / 1000;
-        line.write(bn.note.sample(), 0, length);
-        line.write(Note.REST.sample(), 0, 50);
     }
 }
 
