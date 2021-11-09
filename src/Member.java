@@ -13,6 +13,7 @@ public class Member implements Runnable {
 		this.line = line;
 		length = null;
         t = new Thread(this, note.toString());
+        t.setDaemon(true);
         t.start();
 	}
 	

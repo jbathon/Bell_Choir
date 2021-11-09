@@ -1,13 +1,8 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
 
-import java.io.File;
 
 public class Tone {
 	
@@ -16,10 +11,13 @@ public class Tone {
     	final AudioFormat af = new AudioFormat(Note.SAMPLE_RATE, 8, 1, true, false);
     	Tone t = new Tone(af);
     	
-    	final List<Song> songs = t.getSongs();
+    	TrackLoader loader = new TrackLoader();
+    	final List<Song> songs = loader.getSongs();
+
     	System.out.println("Track List:");
     	for (int i = 0; i < songs.size(); i++) {
-    		System.out.println("   "+ (i+1) + ") " + songs.get(i).title);
+    		Song song = songs.get(i);
+    			System.out.println("   "+ (i+1) + ") " + song.title);
     	}
     	System.out.println("From the list above, input the track number of the song you want the choir to sing.");
     	
@@ -35,9 +33,7 @@ public class Tone {
 			Conductor c = new Conductor(song, af);
 			
 			c.playSong();
-		}
-        
-        
+		}   
     }
 
     private final AudioFormat af;
@@ -47,44 +43,7 @@ public class Tone {
     }
 
     
-    private  List<Song> getSongs() {
-    	
-    	File dir = new File("songs");
-    	
-    	List<Song> songs = new ArrayList<Song>();
-    	
-    	if (dir.isDirectory()) {
-    		File[] files = dir.listFiles();
-	        for(File file : files){
-	        	if(file.isFile()) {
-	        		final String path = file.getPath();
-	        		final String title = path.substring(path.indexOf("\\")+1);
-	        		List<BellNote> song;
-					song = getSong(path);
-					songs.add(new Song(song, title));
-	        	}
-	        }
-    	}
-    	return songs;
-    }
-    
-    private List<BellNote> getSong(String path) {
-    	List<BellNote> song = new ArrayList<BellNote>();
-    	File file = new File(path);
-    	Scanner scanny;
-    	Note note;
-    	NoteLength length;
-    	try {
-		    scanny = new Scanner(file);
-		    while(scanny.hasNextLine()) {
-		        note = Note.valueOf(scanny.next());
-		        length = NoteLength.getNoteLength(scanny.nextInt());
-		        song.add(new BellNote(note,length));
-		        scanny.nextLine();
-		    }
-    	} catch (Exception ignore) {}
-    	return song;
-    }
+
 }
 
 
