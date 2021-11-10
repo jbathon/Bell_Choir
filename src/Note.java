@@ -105,7 +105,7 @@ public enum Note {
 
 
     public static final int SAMPLE_RATE = 192 * 1024; // ~192KHz changed this to stop blowing out my speakers
-    public static final int MEASURE_LENGTH_SEC = 1;
+    public static final int MEASURE_LENGTH_SEC = 2;
 
     // Circumference of a circle divided by # of samples
     private static final double step_alpha = (2.0d * Math.PI) / SAMPLE_RATE;
@@ -140,7 +140,9 @@ enum NoteLength {
     WHOLE(1.0f),
     HALF(0.5f),
     QUARTER(0.25f),
-    EIGTH(0.125f);
+    SIXTH(0.1667f),
+    EIGTH(0.125f),
+    SIXTEENTH(0.0625f);
 
     private final int timeMs;
 
@@ -162,6 +164,8 @@ enum NoteLength {
     		return NoteLength.QUARTER;
     	case 8:
     		return NoteLength.EIGTH;
+    	case 16:
+    		return NoteLength.SIXTEENTH;
     	default:
     		throw new RuntimeException("Invalid value for NoteLength " + n);
     	}
