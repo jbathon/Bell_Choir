@@ -15,7 +15,7 @@ final public class TrackLoader {
 	        for(File file : files){
 	        	if(file.isFile()) {
 	        		final String path = file.getPath();
-	        		final String title = path.substring(path.indexOf("/")+1);
+	        		final String title = path.substring(path.indexOf("\\")+1);
 	        		List<BellNote> bellNotes = getSong(path,title);
 	        		Song song = new Song(bellNotes, title);
 					if(song.exists()) {
