@@ -1,7 +1,7 @@
 import java.util.List;
 
 /**
- * Song Consist of a list of {@code BellNotes} bellNotes and a {@code Sting} title. Songs can check if they exist (not {@value null}), return bellNotes, or return a string of the song.
+ * Defines a song as a list of {@code BellNotes} bellNotes and a {@code Sting} title. Songs can check if they exist (not {@code null}), return bellNotes, or return a string of the song.
  * 
  * @author Jaden C. Bathon
  * @see BellNotes
@@ -24,19 +24,32 @@ public class Song {
     this.title = title;
   }
 
+  /**
+   * @return A list of {@BellNotes}
+   */
   public List<BellNote> getBellNotes() {
     return bellNotes;
   }
 
+  /**
+   * Checks if the song is null.
+   * 
+   * @return A boolean of {@code true} if the song is not {@code null} or {@code false} if the song is null.
+   */
   public boolean exists() {
     return bellNotes != null;
   }
 
+  /**
+   * Returns a string representing a Song.
+   * 
+   * @return A {@code String} representing a Song.
+   */
   @Override
   public String toString() {
     String str = title + "\n";
-    for (BellNote n : bellNotes) {
-      str += n.toString() + "\n";
+    for (BellNote bn : bellNotes) {
+      str += bn.toString() + "\n";
     }
     return str;
   }
