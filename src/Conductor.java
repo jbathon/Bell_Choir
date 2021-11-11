@@ -1,22 +1,53 @@
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+/**
+ * Defines a {@code Conductor} as a {@code Song} and an {@code AudioFormat}. To
+ * play a song the {@code Conductor} create a list of {@code Members} and tells
+ * them when it is there turn to play there assigned note.
+ * 
+ * @author Jaden C. Bathon
+ * 
+ * @see AudioFormat
+ * @see Song
+ * @see BellNotes
+ * @see Member
+ */
+
 public class Conductor {
 
   private final Song song;
-  private final Tone t;
+  public final AudioFormat af;
 
-  /*
-   * Defines Conductor as a Song and Tone
+  /**
+   * Defines a {@code Conductor} as a Song and an {@code AudioFormat}.
+   * 
+   * @param song A {@code Song} object
+   * 
+   * @see AudioFormat
+   * @see Song
    */
-  Conductor(Song song, Tone t) {
+  Conductor(Song song) {
     this.song = song;
-    this.t = t;
+    af = new AudioFormat(Note.SAMPLE_RATE, 8, 1, true, false);
   }
 
+  /**
+   * Plays the song assigned to the {@code Conductor}. To do this the
+   * {@code Conductor} creates a array of {@code Members} for every {@code Note}.
+   * The {@code Conductor} then assign {@code Members} there {@code Note}. The
+   * {@code Conductor} then cycles through every {@code BellNote} in the songs and
+   * tell the {@code Member} with the corresponding {@code Note} to play there
+   * {@code Note} the {@code NoteLength} of the note.
+   * 
+   * @see BellNote
+   * @see Note
+   * @see NoteLength
+   */
   public void playSong() {
-    try (final SourceDataLine line = AudioSystem.getSourceDataLine(t.af)) {
+    try (final SourceDataLine line = AudioSystem.getSourceDataLine(af)) {
 
       line.open();
       line.start();
@@ -41,7 +72,7 @@ public class Conductor {
 
       line.drain();
     } catch (LineUnavailableException e) {
-      System.err.println("Fatal Error occured when trying to play " + song.title);
+      System.err.println("Fatal Error: occured when trying to play " + song.title);
       System.exit(-1);
     }
   }
