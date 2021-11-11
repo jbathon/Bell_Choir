@@ -77,12 +77,14 @@ final public class TrackLoader {
       try (Scanner songScanner = new Scanner(file)) {
         while (songScanner.hasNextLine()) { // Runs while there are lines to read
           String line = songScanner.nextLine(); // Gets a line.
-          try (Scanner lineScanner = new Scanner(line)) {
-            Note note = Note.valueOf(lineScanner.next()); // Gets the note of that line
-            NoteLength length = NoteLength.getNoteLength(lineScanner.nextInt()); // Gets the Length of that
-                                                                                 // note
-            song.add(new BellNote(note, length));
-            lineScanner.close(); // Closes the Scanner.
+          if (!line.isEmpty()) {
+            try (Scanner lineScanner = new Scanner(line)) {
+              Note note = Note.valueOf(lineScanner.next()); // Gets the note of that line
+              NoteLength length = NoteLength.getNoteLength(lineScanner.nextInt()); // Gets the Length of that
+                                                                                   // note
+              song.add(new BellNote(note, length));
+              lineScanner.close(); // Closes the Scanner.
+            }
           }
           index++; // Increase Line Number
         }
