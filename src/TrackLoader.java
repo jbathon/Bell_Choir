@@ -12,7 +12,7 @@ import java.util.Scanner;
  * @see Song
  * @see BellNote
  */
-final public class TrackLoader {
+ public class TrackLoader {
 
   /**
    * Returns a list of {@code Track}. Theses {@code Track} are loaded in from
@@ -23,7 +23,7 @@ final public class TrackLoader {
    * @see Track
    */
 
-  public List<Track> getTracks() {
+  public static List<Track> getTracks() {
 
     File dir = new File("songs"); // loads the songs directory
 
@@ -67,7 +67,7 @@ final public class TrackLoader {
    * @see Song
    */
 
-  public Song getSong(Track track) {
+  public static Song getSong(Track track) {
 
     File file = new File(track.getPath());
 
@@ -79,9 +79,8 @@ final public class TrackLoader {
           String line = songScanner.nextLine(); // Gets a line.
           if (!line.isEmpty()) {
             try (Scanner lineScanner = new Scanner(line)) {
-              Note note = Note.valueOf(lineScanner.next()); // Gets the note of that line
-              NoteLength length = NoteLength.getNoteLength(lineScanner.nextInt()); // Gets the Length of that
-                                                                                   // note
+              Note note = Note.getNote(lineScanner.next()); // Gets the note of that line
+              NoteLength length = NoteLength.getNoteLength(lineScanner.next()); // Gets the note of that line
               song.add(new BellNote(note, length));
               lineScanner.close(); // Closes the Scanner.
             }
@@ -92,12 +91,18 @@ final public class TrackLoader {
 
         return new Song(song, track.getTitle());
 
+      } catch (InvalidNoteException e) {
+        System.out.println("Invaild Note for \"" + track.getTitle() + "\" at line " + index);
+        return null; // Returns nonexistent song.
+      } catch (InvalidNoteLengthException e) {
+        System.out.println("Invaild Note Length for \"" + track.getTitle() + "\" at line " + index);
+        return null; // Returns nonexistent song.
       } catch (Exception e) { // If file format was invalid it prints the title and line.
-        System.err.println("Invaild song format for \"" + track.getTitle() + "\" at line " + index);
+        System.out.println("Invaild song format for \"" + track.getTitle() + "\" at line " + index);
         return null; // Returns nonexistent song.
       }
     } else { // If file does not exist.
-      System.err.println("\"" + track.getTitle() + "\" not found at \"" + track.getPath() + "\".");
+      System.out.println("\"" + track.getTitle() + "\" not found at \"" + track.getPath() + "\".");
       return null; // Returns nonexistent song.
     }
 

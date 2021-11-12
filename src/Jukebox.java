@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.Scanner;
+import java.awt.Color;
 
 /**
  * Contains @{code main()} which presents the user with a track list of songs.
@@ -17,8 +18,8 @@ public class Jukebox {
       /*
        * Loads songs in the songs folder into memory
        */
-      TrackLoader loader = new TrackLoader();
-      final List<Track> trackList = loader.getTracks();
+      
+      final List<Track> trackList = TrackLoader.getTracks();
 
       /*
        * Prompts the User to choose a song to play from properly formated songs
@@ -36,7 +37,7 @@ public class Jukebox {
        */
       Scanner consoleScanner = new Scanner(System.in);
       while (!consoleScanner.hasNext("[1-" + trackList.size() + "]|(-1)")) {
-        System.err.println("Invaild Track! Please input a number between 1 and " + trackList.size());
+        System.out.println("Invaild Track! Please input a number between 1 and " + trackList.size());
         consoleScanner.next();
       }
 
@@ -56,15 +57,14 @@ public class Jukebox {
       }
 
       Track track = trackList.get(trackNum);
-      Song song = loader.getSong(track);
+      Song song = TrackLoader.getSong(track);
 
       if (song != null) {
         Conductor c = new Conductor(song);
         System.out.println("Now Playing: " + song.title);
         c.playSong();
       } else {
-        System.err
-            .println("Error occured when trying to play \"" + track.getTitle() + "\" please select a different track.");
+        System.out.println("Error occured when trying to play \"" + track.getTitle() + "\" please select a different track.");
       }
 
     }
